@@ -3041,6 +3041,9 @@ class Series(base.IndexOpsMixin, NDFrame):  # type: ignore[misc]
         keep_shape: bool = False,
         keep_equal: bool = False,
         result_names: Suffixes = ("self", "other"),
+        check_exact: bool | lib.NoDefault = lib.no_default,
+        rtol: float | lib.NoDefault = lib.no_default,
+        atol: float | lib.NoDefault = lib.no_default,
     ) -> DataFrame | Series:
         return super().compare(
             other=other,
@@ -3048,6 +3051,9 @@ class Series(base.IndexOpsMixin, NDFrame):  # type: ignore[misc]
             keep_shape=keep_shape,
             keep_equal=keep_equal,
             result_names=result_names,
+            check_exact=check_exact,
+            rtol=rtol,
+            atol=atol,
         )
 
     def combine(
