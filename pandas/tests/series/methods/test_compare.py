@@ -142,11 +142,8 @@ def test_compare_tolerance_float(
     print("\n--------------------")
     print("result:\n", result)
 
-    columns = ["self", "other"]
-    indices = pd.Index(range(len(expected_self)))
-    expected = pd.DataFrame(
-        [expected_self, expected_other], index=indices, columns=columns
-    )
+    expected_data = {"self": expected_self, "other": expected_other}
+    expected = pd.DataFrame(expected_data)
 
     print("expected:\n", expected)
     print("--------------------")
