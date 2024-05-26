@@ -9194,8 +9194,8 @@ class NDFrame(PandasObject, indexing.IndexingMixin):
         keep_equal: bool = False,
         result_names: Suffixes = ("self", "other"),
         check_exact: bool | lib.NoDefault = lib.no_default,
-        rtol: float | lib.NoDefault = lib.no_default,
-        atol: float | lib.NoDefault = lib.no_default,
+        rtol: float | int | list | dict | lib.NoDefault = lib.no_default,
+        atol: float | int | list | dict | lib.NoDefault = lib.no_default,
     ) -> DataFrame | Series:
         if (
             check_exact is lib.no_default
@@ -9223,10 +9223,25 @@ class NDFrame(PandasObject, indexing.IndexingMixin):
         if not check_exact:
             if isinstance(self, ABCDataFrame):
                 mask = np.ones(self.shape, dtype=bool)
-                for col in self.columns:
+
+                for i, col in enumerate(self.columns):
+                    if isinstance(rtol, dict) and isinstance(self, ABCDataFrame):
+                        r_tol = rtol.get(col, 1.0e-5)
+                    elif isinstance(rtol, list) and isinstance(self, ABCDataFrame):
+                        r_tol = rtol[i]
+                    else:
+                        r_tol = rtol
+
+                    if isinstance(atol, dict):
+                        a_tol = atol.get(col, 1.0e-8)
+                    elif isinstance(atol, list):
+                        a_tol = atol[i]
+                    else:
+                        a_tol = atol
+
                     if is_float_dtype(self[col]) and is_float_dtype(other[col]):
                         mask[:, self.columns.get_loc(col)] = np.isclose(
-                            self[col], other[col], rtol=rtol, atol=atol
+                            self[col], other[col], rtol=r_tol, atol=a_tol
                         )
                     else:
                         mask[:, self.columns.get_loc(col)] = self[col] == other[col]

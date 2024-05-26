@@ -8390,9 +8390,27 @@ class DataFrame(NDFrame, OpsMixin):
         keep_equal: bool = False,
         result_names: Suffixes = ("self", "other"),
         check_exact: bool | lib.NoDefault = lib.no_default,
-        rtol: float | lib.NoDefault = lib.no_default,
-        atol: float | lib.NoDefault = lib.no_default,
+        rtol: float | int | list | dict | lib.NoDefault = lib.no_default,
+        atol: float | int | list | dict | lib.NoDefault = lib.no_default,
     ) -> DataFrame:
+        if rtol is not lib.no_default:
+            if not isinstance(rtol, (int, float, list, dict)):
+                raise TypeError(
+                    f"rtol must be a number, list or dict, got {type(rtol)}"
+                )
+
+            if isinstance(atol, (float, int)) and atol < 0:
+                raise ValueError("atol must be non-negative number")
+
+        if atol is not lib.no_default:
+            if not isinstance(atol, (int, float, list, dict)):
+                raise TypeError(
+                    f"atol must be a number, list or dict, got {type(atol)}"
+                )
+
+            if isinstance(rtol, (float, int)) and rtol < 0:
+                raise ValueError("atol must be a non-negative number")
+
         return super().compare(
             other=other,
             align_axis=align_axis,

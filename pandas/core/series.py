@@ -3042,9 +3042,17 @@ class Series(base.IndexOpsMixin, NDFrame):  # type: ignore[misc]
         keep_equal: bool = False,
         result_names: Suffixes = ("self", "other"),
         check_exact: bool | lib.NoDefault = lib.no_default,
-        rtol: float | lib.NoDefault = lib.no_default,
-        atol: float | lib.NoDefault = lib.no_default,
+        rtol: int | float | lib.NoDefault = lib.no_default,
+        atol: int | float | lib.NoDefault = lib.no_default,
     ) -> DataFrame | Series:
+        if rtol is not lib.no_default:
+            if not isinstance(rtol, (float, int)) or rtol < 0:
+                raise ValueError("rtol must be a non-negative number")
+
+        if atol is not lib.no_default:
+            if not isinstance(atol, (float, int)) or atol < 0:
+                raise ValueError("atol must be a non-negative number")
+
         return super().compare(
             other=other,
             align_axis=align_axis,

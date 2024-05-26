@@ -251,6 +251,41 @@ def test_compare_tolerance_float(
 
 
 @pytest.mark.parametrize(
+    "atol, expected_self, expected_other",
+    [
+        ([0.1, 0.2], [], []),
+        ({"col1": 0.1, "col2": 0.2}, [], []),
+        ({"col1": 0.1}, [1.0, 2.0], [1.2, 2.2]),
+    ],
+)
+def test_compare_tolerance_dict_or_list(atol, expected_self, expected_other):
+    df1 = pd.DataFrame({"col1": [1.0, 2.0], "col2": [1.0, 2.0]})
+
+    df2 = pd.DataFrame({"col1": [1.1, 2.1], "col2": [1.2, 2.2]})
+
+    result = df1.compare(df2, atol=atol)
+
+    if expected_self == [] and expected_other == []:
+        expected = pd.DataFrame(pd.MultiIndex(levels=[[], []], codes=[[], []]))
+        tm.assert_frame_equal(result, expected)
+    else:
+        expected = pd.DataFrame(
+            {
+                ("col2", "self"): pd.Series(expected_self),
+                ("col2", "other"): pd.Series(expected_other),
+            }
+        )
+        tm.assert_frame_equal(result, expected)
+
+    print("\n--------------------")
+    print("result:\n", result)
+    print("expected:\n", expected)
+    print("--------------------")
+
+    tm.assert_frame_equal(result, expected)
+
+
+@pytest.mark.parametrize(
     "result_names",
     [
         [1, 2],
